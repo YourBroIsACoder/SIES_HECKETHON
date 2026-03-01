@@ -1,26 +1,156 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ── Dark (default) ── */
+:root,
+html.dark {
+  --bg-page: #09090b;
+  --bg-sidebar: #0a0a0b;
+  --bg-card: #121214;
+  --bg-card-hover: #18181b;
+  --bg-muted: #27272a;
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --border-card: rgba(255, 255, 255, 0.08);
+  --border-muted: rgba(255, 255, 255, 0.10);
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+  --text-faint: #52525b;
+  --scrollbar-thumb: rgba(255, 255, 255, 0.10);
+  --scrollbar-thumb-hover: rgba(255, 255, 255, 0.20);
+  --recharts-grid: rgba(255, 255, 255, 0.05);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ── Light ── */
+html.light {
+  --bg-page: #f4f4f5;
+  --bg-sidebar: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f4f4f5;
+  --bg-muted: #e4e4e7;
+  --border-subtle: rgba(0, 0, 0, 0.06);
+  --border-card: rgba(0, 0, 0, 0.08);
+  --border-muted: rgba(0, 0, 0, 0.12);
+  --text-primary: #09090b;
+  --text-secondary: #52525b;
+  --text-muted: #71717a;
+  --text-faint: #a1a1aa;
+  --scrollbar-thumb: rgba(0, 0, 0, 0.15);
+  --scrollbar-thumb-hover: rgba(0, 0, 0, 0.25);
+  --recharts-grid: rgba(0, 0, 0, 0.07);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ─── Theme-aware utility classes ─── */
+.theme-bg-page {
+  background-color: var(--bg-page) !important;
+}
+
+.theme-bg-sidebar {
+  background-color: var(--bg-sidebar) !important;
+}
+
+.theme-bg-card {
+  background-color: var(--bg-card) !important;
+}
+
+.theme-bg-muted {
+  background-color: var(--bg-muted) !important;
+}
+
+.theme-border {
+  border-color: var(--border-card) !important;
+}
+
+.theme-text {
+  color: var(--text-primary) !important;
+}
+
+.theme-text-muted {
+  color: var(--text-secondary) !important;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+/* ─── Recharts ─── */
+.recharts-tooltip-cursor {
+  fill: rgba(255, 255, 255, 0.02) !important;
+}
+
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  stroke: var(--recharts-grid);
+}
+
+/* ─── Override hardcoded dark backgrounds in light mode ─── */
+html.light [class*="bg-[#09090b]"],
+html.light [class*="bg-[#0a0a0b]"],
+html.light [class*="bg-[#121214]"],
+html.light [class*="bg-[#18181b]"] {
+  background-color: var(--bg-card) !important;
+}
+
+html.light [class*="bg-zinc-900"],
+html.light [class*="bg-zinc-800"],
+html.light .bg-zinc-800\/50 {
+  background-color: var(--bg-muted) !important;
+}
+
+html.light [class*="text-zinc-100"],
+html.light [class*="text-zinc-200"],
+html.light [class*="text-white"] {
+  color: var(--text-primary) !important;
+}
+
+html.light [class*="text-zinc-400"],
+html.light [class*="text-zinc-300"] {
+  color: var(--text-secondary) !important;
+}
+
+html.light [class*="text-zinc-500"],
+html.light [class*="text-zinc-600"] {
+  color: var(--text-muted) !important;
+}
+
+html.light [class*="border-white\/5"],
+html.light [class*="border-white\/10"],
+html.light [class*="border-white\/20"],
+html.light [class*="border-zinc-800"],
+html.light [class*="border-zinc-700"] {
+  border-color: var(--border-card) !important;
+}
+
+html.light [class*="bg-black\/"],
+html.light [class*="bg-black"] {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Make sidebar and page root background respond to theme */
+html.light .min-h-screen {
+  background-color: var(--bg-page) !important;
 }
