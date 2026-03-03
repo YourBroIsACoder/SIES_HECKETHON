@@ -45,8 +45,8 @@ export default function ScoreSimulator() {
             />
 
             {/* Chart */}
-            <div className="h-40 w-full mb-6">
-                <ResponsiveContainer width="100%" height="100%">
+            <div className="h-40 w-full mb-6 relative" style={{ minHeight: 160, minWidth: 10 }}>
+                <ResponsiveContainer width="100%" height={160}>
                     <AreaChart data={projectedData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
                         <defs>
                             <linearGradient id="simGrad" x1="0" y1="0" x2="0" y2="1">

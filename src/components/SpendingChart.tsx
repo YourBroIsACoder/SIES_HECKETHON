@@ -45,8 +45,8 @@ export default function SpendingChart() {
 
             <div className="grid grid-cols-2 gap-6 items-center">
                 {/* Donut */}
-                <div className="relative h-48 w-full flex items-center justify-center">
-                    <ResponsiveContainer width="100%" height="100%">
+                <div className="relative h-48 w-full flex items-center justify-center" style={{ minHeight: 192, minWidth: 10 }}>
+                    <ResponsiveContainer width="100%" height={192}>
                         <PieChart>
                             <Pie data={categorySpending} cx="50%" cy="50%"
                                 innerRadius={52} outerRadius={74}
@@ -83,8 +83,8 @@ export default function SpendingChart() {
             <Divider />
 
             {/* Bar chart */}
-            <div className="h-36 w-full">
-                <ResponsiveContainer width="100%" height="100%">
+            <div className="h-36 w-full relative" style={{ minHeight: 144, minWidth: 10 }}>
+                <ResponsiveContainer width="100%" height={144}>
                     <BarChart data={categorySpending} margin={{ top: 0, right: 0, left: -25, bottom: 0 }} barSize={14}>
                         <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.03)" />
                         <XAxis dataKey="category" tick={{ fill: "#71717a", fontSize: 9 }} axisLine={false} tickLine={false} />
