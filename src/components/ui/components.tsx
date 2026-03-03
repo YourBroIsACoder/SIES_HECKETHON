@@ -66,13 +66,13 @@ const badgeStyles = {
     critical: { bg: "rgba(239,68,68,0.10)", border: "rgba(239,68,68,0.25)", color: "#f87171" },
 };
 
-export function Badge({ children, variant = "default", dot = false }: {
-    children: ReactNode; variant?: keyof typeof badgeStyles; dot?: boolean;
+export function Badge({ children, variant = "default", dot = false, className = "" }: {
+    children: ReactNode; variant?: keyof typeof badgeStyles; dot?: boolean; className?: string;
 }) {
     const s = badgeStyles[variant] || badgeStyles.default;
     return (
         <span
-            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium"
+            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium ${className}`}
             style={{ background: s.bg, border: `1px solid ${s.border}`, color: s.color }}
         >
             {dot && <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: s.color }} />}
