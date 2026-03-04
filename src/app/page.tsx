@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Sidebar from "@/components/Sidebar";
 import CreditScoreWidget from "@/components/CreditScoreWidget";
 import CardUtilization from "@/components/CardUtilization";
@@ -56,7 +56,7 @@ function TabView({ tab }: { tab: string }) {
     case "dashboard":
       return (
         <div className="space-y-6">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 xl:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 xl:gap-6">
             {statsData.map((s, i) => <HeroStatCard key={s.label} stat={s} index={i} />)}
           </div>
           <div className="grid grid-cols-1 xl:grid-cols-5 gap-6">
@@ -118,7 +118,16 @@ const tabTitles: Record<string, { title: string; desc: string }> = {
 export default function Home() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
   const info = tabTitles[activeTab];
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    setIsDesktop(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
 
   return (
     <div style={{ backgroundColor: 'var(--bg-page)', color: 'var(--text-primary)' }} className="min-h-screen flex flex-col lg:flex-row selection:bg-blue-500/30">
@@ -126,9 +135,9 @@ export default function Home() {
 
       <main
         className="flex-1 min-w-0 relative transition-all duration-300"
-        style={{ marginLeft: sidebarCollapsed ? 72 : 260 }}
+        style={{ marginLeft: isDesktop ? (sidebarCollapsed ? 72 : 260) : 0 }}
       >
-        <div className="max-w-[1400px] mx-auto p-4 md:p-8 lg:p-10 w-full pt-20 lg:pt-10">
+        <div className="max-w-[1400px] mx-auto p-4 md:p-8 lg:p-10 w-full pb-20 pt-20 lg:pt-10 lg:pb-10">
 
           <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>

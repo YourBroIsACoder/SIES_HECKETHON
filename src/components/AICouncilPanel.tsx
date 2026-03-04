@@ -22,6 +22,56 @@ const badgePriority: Record<string, "danger" | "warning" | "info"> = {
     critical: "danger", high: "warning", medium: "info",
 };
 
+// ── Structured Council Summary Data ──────────────────────────────────────────
+const COUNCIL_SUMMARY = {
+    orchestratorActivation: "AI Council activated — 4 specialized agents analyzing Axis ACE (64% utilization, 2-day statement window).",
+    agents: [
+        {
+            id: "utilization",
+            icon: "📊",
+            label: "Utilization Agent",
+            color: "#3b82f6",
+            priority: "critical" as const,
+            domain: "Risk & Recommendation",
+            insight: "Axis ACE at **64% utilization** (₹51,000 / ₹80,000). This single card is the primary drag on your score. Immediate partial payment before statement close will reduce reported utilization to **29%** — the safe zone. No other card requires urgent action.",
+        },
+        {
+            id: "timing",
+            icon: "⏰",
+            label: "Timing Agent",
+            color: "#8b5cf6",
+            priority: "high" as const,
+            domain: "Statement Cycle",
+            insight: "Statement closes in **2 days** (Mar 6). Bureaus record whatever balance exists at close — pay before then to maximize score gain. Post-close payments won't be reflected until next cycle. Window is closing.",
+        },
+        {
+            id: "rewards",
+            icon: "🎁",
+            label: "Rewards Agent",
+            color: "#10b981",
+            priority: "medium" as const,
+            domain: "Spend Optimization",
+            insight: "Post-payment, route **fuel spend** to SBI SimplyCLICK (5× points vs. HDFC Regalia 1×). Keep high-ticket travel on Axis ACE Visa to maximise cashback once utilization is healthy.",
+        },
+        {
+            id: "simulator",
+            icon: "🔮",
+            label: "Score Simulator",
+            color: "#f59e0b",
+            priority: "high" as const,
+            domain: "Projected Impact",
+            insight: "Paying ₹51,000 on Axis ACE → utilization drops from **64% → 29%**. Projected score gain: **+20 to +30 points** (742 → 762–772). Score enters the 'Very Good' band, unlocking premium card upgrades.",
+        },
+    ],
+    summary: {
+        consensus: "Pay ₹51,000 on Axis ACE within 2 days, before the Mar 6 statement close. This single action collapses a high-utilization flag and is projected to add 20–30 points — crossing into the 'Very Good' tier.",
+        priority: "CRITICAL",
+        outcome: "Score: 742 → 762–772 · Utilization: 64% → 29% · Timeline: 2 days",
+    },
+};
+
+// ── Sub-components ─────────────────────────────────────────────────────────────
+
 function TypingDots() {
     return (
         <div className="flex items-center gap-1 py-1 px-1">
@@ -35,7 +85,6 @@ function TypingDots() {
 }
 
 function MarkdownLine({ text }: { text: string }) {
-    // Bold **text** → <strong>
     const parts = text.split(/\*\*(.*?)\*\*/g);
     return (
         <span>
@@ -86,6 +135,8 @@ async function callApi(agentId: string, userMessage: string, onChunk: (c: string
     }
 }
 
+// ── Agent Chat View ───────────────────────────────────────────────────────────
+
 function AgentChat({ agentId, onBack }: { agentId: string; onBack: () => void }) {
     const meta = AGENT_META[agentId];
     const [messages, setMessages] = useState<Message[]>([]);
@@ -106,8 +157,6 @@ function AgentChat({ agentId, onBack }: { agentId: string; onBack: () => void })
 
         let full = "";
         const onChunk = (c: string) => { full += c; setPartial(full); };
-
-        // Try real API first, fall back to simulation
         const apiOk = await callApi(agentId, text, onChunk);
         if (!apiOk) {
             full = "";
@@ -218,25 +267,104 @@ function AgentChat({ agentId, onBack }: { agentId: string; onBack: () => void })
                     whileTap={{ scale: 0.95 }}
                     className="w-10 h-10 rounded-xl flex items-center justify-center transition-all disabled:opacity-30"
                     style={{ background: `${meta.color}18`, border: `1px solid ${meta.color}35`, color: meta.color }}>
-                    {streaming
-                        ? <Icon name="loader" size={15} />
-                        : <Icon name="send" size={15} />}
+                    {streaming ? <Icon name="loader" size={15} /> : <Icon name="send" size={15} />}
                 </motion.button>
             </form>
         </div>
     );
 }
 
+// ── Structured Council Summary View ──────────────────────────────────────────
+
+function CouncilSummaryView({ onBack }: { onBack: () => void }) {
+    return (
+        <div className="space-y-3">
+            {/* Back button */}
+            <div className="flex items-center gap-3 mb-4 pb-4" style={{ borderBottom: "1px solid var(--border-subtle)" }}>
+                <button onClick={onBack}
+                    className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors text-zinc-400 hover:text-white"
+                    style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                    <Icon name="chevronLeft" size={14} />
+                </button>
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg shrink-0"
+                    style={{ background: "rgba(59,130,246,0.12)", border: "1px solid rgba(59,130,246,0.25)" }}>🧠</div>
+                <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm text-zinc-100">Council Session Report</p>
+                    <p className="text-xs text-zinc-500">Multi-agent consensus · Real-time analysis</p>
+                </div>
+                <Badge variant="success" dot>Live</Badge>
+            </div>
+
+            {/* Orchestrator activation */}
+            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+                className="px-4 py-3 rounded-xl flex items-start gap-3"
+                style={{ background: "rgba(59,130,246,0.06)", border: "1px solid rgba(59,130,246,0.18)" }}>
+                <span className="text-lg shrink-0 mt-0.5">🧠</span>
+                <div>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-blue-400 mb-1">Orchestrator Activation</p>
+                    <p className="text-sm text-zinc-300 leading-relaxed">{COUNCIL_SUMMARY.orchestratorActivation}</p>
+                </div>
+            </motion.div>
+
+            {/* Individual agent cards */}
+            <div className="space-y-2">
+                {COUNCIL_SUMMARY.agents.map((agent, i) => (
+                    <motion.div key={agent.id}
+                        initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.05 + i * 0.07 }}
+                        className="p-3.5 rounded-xl"
+                        style={{ background: `${agent.color}08`, border: `1px solid ${agent.color}20` }}>
+                        <div className="flex items-center gap-2.5 mb-2">
+                            <span className="text-base">{agent.icon}</span>
+                            <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                    <span className="font-semibold text-sm" style={{ color: agent.color }}>{agent.label}</span>
+                                    <Badge variant={badgePriority[agent.priority] || "info"}>{agent.priority}</Badge>
+                                </div>
+                                <p className="text-[10px] uppercase tracking-wider mt-0.5" style={{ color: `${agent.color}90` }}>{agent.domain}</p>
+                            </div>
+                        </div>
+                        <div className="pl-7">
+                            <MessageContent text={agent.insight} />
+                        </div>
+                    </motion.div>
+                ))}
+            </div>
+
+            {/* Orchestrator summary */}
+            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
+                className="p-4 rounded-xl relative overflow-hidden"
+                style={{ background: "rgba(16,185,129,0.07)", border: "1px solid rgba(16,185,129,0.25)", boxShadow: "0 0 30px rgba(16,185,129,0.05)" }}>
+                <div className="absolute right-3 top-3 text-[40px] opacity-[0.05] pointer-events-none select-none">🧠</div>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-400 mb-2">Final Orchestrator Summary</p>
+                <p className="text-sm text-zinc-300 leading-relaxed mb-3">{COUNCIL_SUMMARY.summary.consensus}</p>
+                <div className="flex flex-wrap items-center gap-2">
+                    <span className="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase"
+                        style={{ background: "rgba(239,68,68,0.15)", color: "#f87171", border: "1px solid rgba(239,68,68,0.3)" }}>
+                        Priority: {COUNCIL_SUMMARY.summary.priority}
+                    </span>
+                    <span className="text-xs text-zinc-400 font-mono">{COUNCIL_SUMMARY.summary.outcome}</span>
+                </div>
+            </motion.div>
+        </div>
+    );
+}
+
+// ── Main AI Council Panel ──────────────────────────────────────────────────────
+
 export default function AICouncilPanel() {
     const [activeAgent, setActiveAgent] = useState<string | null>(null);
+    const [showCouncil, setShowCouncil] = useState(false);
 
     const agents = [
         { id: "utilization", priority: "critical", desc: `Axis ACE at ${Math.round((creditCards.find(c => c.id === "axis_ace")!.used / creditCards.find(c => c.id === "axis_ace")!.limit) * 100)}% — needs immediate action` },
-        { id: "timing", priority: "high", desc: "Amazon ICICI closes in 2 days" },
+        { id: "timing", priority: "high", desc: "Axis ACE closes in 2 days — act now" },
         { id: "rewards", priority: "medium", desc: "Missing 5× points on fuel spend" },
-        { id: "simulator", priority: "high", desc: "Score could hit 771 by Mar 31" },
+        { id: "simulator", priority: "high", desc: "Score could hit 762–772 by Mar 31" },
         { id: "coach", priority: "medium", desc: "8 pts from 750 · Infinia eligible" },
     ];
+
+    const isOpen = !!activeAgent || showCouncil;
 
     return (
         <Card glow>
@@ -246,8 +374,8 @@ export default function AICouncilPanel() {
                 icon="bot"
                 action={
                     <div className="flex items-center gap-2">
-                        {activeAgent && (
-                            <button onClick={() => setActiveAgent(null)} className="text-zinc-500 hover:text-white transition-colors">
+                        {isOpen && (
+                            <button onClick={() => { setActiveAgent(null); setShowCouncil(false); }} className="text-zinc-500 hover:text-white transition-colors">
                                 <Icon name="refresh" size={14} />
                             </button>
                         )}
@@ -263,13 +391,19 @@ export default function AICouncilPanel() {
                         exit={{ opacity: 0, x: -24 }} transition={{ duration: 0.22 }}>
                         <AgentChat agentId={activeAgent} onBack={() => setActiveAgent(null)} />
                     </motion.div>
+                ) : showCouncil ? (
+                    <motion.div key="council"
+                        initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -24 }} transition={{ duration: 0.22 }}>
+                        <CouncilSummaryView onBack={() => setShowCouncil(false)} />
+                    </motion.div>
                 ) : (
                     <motion.div key="grid"
                         initial={{ opacity: 0, x: -24 }} animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: 24 }} transition={{ duration: 0.22 }}>
 
-                        {/* Orchestrator hero */}
-                        <motion.button whileTap={{ scale: 0.99 }} onClick={() => setActiveAgent("orchestrator")}
+                        {/* Orchestrator hero — now opens Council Summary */}
+                        <motion.button whileTap={{ scale: 0.99 }} onClick={() => setShowCouncil(true)}
                             className="w-full text-left mb-4 p-4 rounded-2xl relative overflow-hidden group transition-all"
                             style={{ background: "rgba(59,130,246,0.05)", border: "1px solid rgba(59,130,246,0.15)" }}>
                             <div className="absolute right-3 top-3 text-[48px] opacity-[0.06] select-none pointer-events-none">🧠</div>
@@ -283,7 +417,7 @@ export default function AICouncilPanel() {
                                 <Icon name="chevronRight" size={14} className="ml-auto opacity-40 group-hover:opacity-80 transition-opacity" style={{ color: "#60a5fa" }} />
                             </div>
                             <p className="text-xs leading-relaxed pl-11" style={{ color: "rgba(147,197,253,0.7)" }}>
-                                Priority: Pay ₹51,000 on Axis ACE before statement close → Expected gain: <strong className="text-blue-300">28 pts</strong>. Click to chat.
+                                Priority: Pay ₹51,000 on Axis ACE before statement close → Expected gain: <strong className="text-blue-300">+20–30 pts</strong>. Click for full council report.
                             </p>
                         </motion.button>
 
@@ -307,7 +441,7 @@ export default function AICouncilPanel() {
                                             {meta.icon}
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <div className="flex items-center gap-2 mb-0.5">
+                                            <div className="flex items-center gap-2 mb-0.5 flex-wrap">
                                                 <span className="font-semibold text-sm" style={{ color: "var(--text-primary)" }}>{meta.label}</span>
                                                 <Badge variant={badgePriority[agent.priority] || "info"}>{agent.priority}</Badge>
                                             </div>
@@ -324,7 +458,7 @@ export default function AICouncilPanel() {
                             style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
                             <Icon name="sparkles" size={12} className="shrink-0 text-amber-400" />
                             <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-                                Click any agent to open an AI chat with your full credit profile injected as context.
+                                Click 🧠 for a full council session report, or any agent to open a dedicated AI chat.
                             </p>
                         </div>
                     </motion.div>

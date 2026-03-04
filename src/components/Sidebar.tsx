@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { userProfile } from "@/lib/data";
 import { Icon } from "./ui/icons";
@@ -10,9 +10,9 @@ const navItems = [
     { id: "dashboard", label: "Overview", iconName: "layoutGrid" as const },
     { id: "cards", label: "My Cards", iconName: "creditCard" as const },
     { id: "insights", label: "AI Council", iconName: "zap" as const },
-    { id: "simulator", label: "Score Simulator", iconName: "activity" as const },
-    { id: "calendar", label: "Pay Calendar", iconName: "calendar" as const },
-    { id: "unlocks", label: "Score Unlocks", iconName: "target" as const },
+    { id: "simulator", label: "Simulator", iconName: "activity" as const },
+    { id: "calendar", label: "Calendar", iconName: "calendar" as const },
+    { id: "unlocks", label: "Unlocks", iconName: "target" as const },
 ];
 
 export default function Sidebar({ activeTab, onTabChange, onCollapsedChange }: {
@@ -39,33 +39,41 @@ export default function Sidebar({ activeTab, onTabChange, onCollapsedChange }: {
 
     return (
         <>
-            {/* Mobile hamburger */}
+            {/* ── Mobile hamburger (top-left) ── */}
             <button
                 onClick={() => setMobileOpen(true)}
-                className="lg:hidden fixed top-6 left-6 z-40 w-10 h-10 bg-[#121214] border border-white/10 rounded-xl flex items-center justify-center text-zinc-400"
+                className="lg:hidden fixed top-4 left-4 z-40 w-10 h-10 bg-[#121214] border border-white/10 rounded-xl flex items-center justify-center text-zinc-400 shadow-lg"
+                aria-label="Open menu"
             >
                 <Icon name="menu" size={20} />
             </button>
 
-            {/* Mobile backdrop */}
-            {mobileOpen && (
-                <div
-                    className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
-                    onClick={() => setMobileOpen(false)}
-                />
-            )}
+            {/* ── Mobile backdrop ── */}
+            <AnimatePresence>
+                {mobileOpen && (
+                    <motion.div
+                        key="backdrop"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="lg:hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-40"
+                        onClick={() => setMobileOpen(false)}
+                    />
+                )}
+            </AnimatePresence>
 
+            {/* ── Desktop & Mobile sidebar ── */}
             <motion.aside
                 animate={{ width: collapsed ? 72 : 260 }}
                 transition={{ type: "spring", stiffness: 380, damping: 38 }}
                 style={{ backgroundColor: "var(--bg-sidebar)", borderColor: "var(--border-subtle)" }}
                 className={`fixed left-0 top-0 h-full z-50 border-r flex flex-col overflow-hidden
-                    lg:translate-x-0 transition-transform duration-300
+                    transition-transform duration-300
                     ${mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
             >
                 {/* Header */}
                 <div className="h-16 flex items-center justify-between px-4 shrink-0" style={{ borderBottom: "1px solid var(--border-subtle)" }}>
-                    {/* Logo — hidden when collapsed */}
+                    {/* Logo */}
                     <motion.div
                         animate={{ opacity: collapsed ? 0 : 1, width: collapsed ? 0 : "auto" }}
                         transition={{ duration: 0.2 }}
@@ -77,33 +85,39 @@ export default function Sidebar({ activeTab, onTabChange, onCollapsedChange }: {
                         <span className="text-zinc-100 font-bold tracking-tight whitespace-nowrap">CreditIQ</span>
                     </motion.div>
 
-                    {/* When collapsed, show only the logo icon */}
+                    {/* Collapsed: center logo icon */}
                     {collapsed && (
                         <div className="w-7 h-7 rounded-lg bg-emerald-500 flex items-center justify-center font-bold text-black text-xs mx-auto">
                             CQ
                         </div>
                     )}
 
-                    {/* Right controls — only on desktop */}
+                    {/* Right controls */}
                     {!collapsed && (
-                        <div className="hidden lg:flex items-center gap-1 shrink-0">
+                        <div className="flex items-center gap-1 shrink-0">
+                            {/* Theme toggle — desktop only */}
                             <button
-                                className="flex items-center justify-center text-zinc-500 hover:text-white w-7 h-7 rounded-lg hover:bg-zinc-800 transition-colors"
+                                className="hidden lg:flex items-center justify-center text-zinc-500 hover:text-white w-7 h-7 rounded-lg hover:bg-zinc-800 transition-colors"
                                 onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
                                 title="Toggle theme"
                             >
                                 {mounted && resolvedTheme !== "dark" ? <Icon name="moon" size={15} /> : <Icon name="sun" size={15} />}
                             </button>
+
+                            {/* Collapse sidebar — desktop only */}
                             <button
-                                className="flex items-center justify-center text-zinc-500 hover:text-white w-7 h-7 rounded-lg hover:bg-zinc-800 transition-colors"
+                                className="hidden lg:flex items-center justify-center text-zinc-500 hover:text-white w-7 h-7 rounded-lg hover:bg-zinc-800 transition-colors"
                                 onClick={() => setCollapsedWithCallback(true)}
                                 title="Collapse sidebar"
                             >
                                 <Icon name="chevronLeft" size={15} />
                             </button>
+
+                            {/* Close drawer — mobile only */}
                             <button
-                                className="lg:hidden text-zinc-500 hover:text-white w-7 h-7 rounded-lg hover:bg-zinc-800 flex items-center justify-center"
+                                className="lg:hidden flex items-center justify-center text-zinc-500 hover:text-white w-7 h-7 rounded-lg hover:bg-zinc-800 transition-colors"
                                 onClick={() => setMobileOpen(false)}
+                                aria-label="Close menu"
                             >
                                 <Icon name="x" size={15} />
                             </button>
@@ -111,7 +125,7 @@ export default function Sidebar({ activeTab, onTabChange, onCollapsedChange }: {
                     )}
                 </div>
 
-                {/* Expand button — shown as floating pill when collapsed */}
+                {/* Expand button when collapsed */}
                 {collapsed && (
                     <div className="flex justify-center pt-3 pb-1">
                         <button
@@ -124,7 +138,7 @@ export default function Sidebar({ activeTab, onTabChange, onCollapsedChange }: {
                     </div>
                 )}
 
-                {/* Nav */}
+                {/* Nav items */}
                 <div className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
                     {!collapsed && (
                         <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest px-2 mb-3 mt-1 select-none">
@@ -170,6 +184,36 @@ export default function Sidebar({ activeTab, onTabChange, onCollapsedChange }: {
                     </div>
                 </div>
             </motion.aside>
+
+            {/* ── Mobile Bottom Tab Bar ── */}
+            <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 border-t"
+                style={{ backgroundColor: "var(--bg-sidebar)", borderColor: "var(--border-subtle)" }}>
+                <div className="flex items-center justify-around px-2 py-1 safe-bottom">
+                    {navItems.map((item) => {
+                        const isActive = activeTab === item.id;
+                        return (
+                            <button
+                                key={item.id}
+                                onClick={() => onTabChange(item.id)}
+                                className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl flex-1 transition-all"
+                                style={{ color: isActive ? "#34d399" : "#71717a" }}
+                            >
+                                <Icon name={item.iconName} size={20} style={{ color: isActive ? "#34d399" : "#71717a" }} />
+                                <span className="text-[9px] font-medium tracking-wide whitespace-nowrap">
+                                    {item.label}
+                                </span>
+                                {isActive && (
+                                    <motion.div
+                                        layoutId="bottomTabIndicator"
+                                        className="absolute bottom-0 h-0.5 w-10 rounded-full bg-emerald-400"
+                                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                                    />
+                                )}
+                            </button>
+                        );
+                    })}
+                </div>
+            </nav>
         </>
     );
 }

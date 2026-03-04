@@ -154,3 +154,15 @@ html.light [class*="bg-black"] {
 html.light .min-h-screen {
   background-color: var(--bg-page) !important;
 }
+
+/* ─── Safe area (notch / home indicator) ─── */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 8px);
+}
+
+/* ─── Mobile bottom nav spacer ─── */
+@media (max-width: 1023px) {
+  body {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
